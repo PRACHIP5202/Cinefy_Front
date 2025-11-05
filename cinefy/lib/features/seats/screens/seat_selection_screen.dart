@@ -20,9 +20,10 @@ class SeatSelectionScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Failed to load seats\n$e')),
         data: (seats) {
+          // Build a lookup from seatNumber ("1".."100") to actual SeatModel
+          final byNumber = {for (final s in seats) s.seatNumber: s};
           // ensure 1..100 grid even if API returned fewer
-          final allIds = List.generate(100, (i) => i + 1);
-          final bookedSet = seats.where((s) => s.isBooked).map((s) => s.id).toSet();
+          final allNumbers = List.generate(100, (i) => i + 1);
 
           return Column(
             children: [
@@ -39,21 +40,26 @@ class SeatSelectionScreen extends ConsumerWidget {
                       crossAxisSpacing: 8,
                       childAspectRatio: 42 / 38,
                     ),
-                    itemCount: allIds.length,
+                    itemCount: allNumbers.length,
                     itemBuilder: (ctx, i) {
-                      final id = allIds[i];
-                      final isBooked = bookedSet.contains(id);
-                      final isSelected = selection.selected.contains(id);
+                      final number = allNumbers[i];
+                      final seat = byNumber[number.toString()];
+                      final realSeatId = seat?.id; // actual backend seat id
+                      final isBooked = seat?.isBooked == true;
+                      final isSelected = realSeatId != null && selection.selected.contains(realSeatId);
                       final visual = isBooked
                           ? SeatVisual.booked
                           : isSelected
                               ? SeatVisual.selected
                               : SeatVisual.available;
                       return SeatTile(
-                        id: id,
-                        label: id.toString(),
+                        id: realSeatId ?? number,
+                        label: number.toString(),
                         visual: visual,
-                        onTap: () => ref.read(selectionProvider.notifier).toggle(id),
+                        onTap: () {
+                          if (realSeatId == null) return; // seat not provisioned yet
+                          ref.read(selectionProvider.notifier).toggle(realSeatId);
+                        },
                       );
                     },
                   ),

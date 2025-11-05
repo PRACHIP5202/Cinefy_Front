@@ -54,7 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             .showSnackBar(SnackBar(content: Text(message)));
       }
     } else {
-      if (mounted) context.go('/gate');
+      if (mounted) context.go('/home');
     }
   }
 

@@ -59,7 +59,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             .showSnackBar(SnackBar(content: Text(message)));
       }
     } else {
-      if (mounted) context.go('/gate');
+      if (mounted) context.go('/home');
     }
   }
 

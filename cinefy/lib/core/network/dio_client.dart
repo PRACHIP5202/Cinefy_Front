@@ -20,6 +20,8 @@ onRequest: (options, handler) async {
 final token = await Prefs.token;
 if (token != null && token.isNotEmpty) {
 options.headers['Authorization'] = 'Bearer $token';
+          // Add alternate header to survive proxies that strip Authorization
+          options.headers['x-access-token'] = token;
 }
 return handler.next(options);
 },

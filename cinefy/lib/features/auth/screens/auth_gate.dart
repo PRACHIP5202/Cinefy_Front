@@ -12,6 +12,14 @@ const AuthGate({super.key});
 @override
 Widget build(BuildContext context, WidgetRef ref) {
 final auth = ref.watch(authStateProvider);
+auth.maybeWhen(
+data: (user) {
+if (user != null && ModalRoute.of(context)?.settings.name == '/gate') {
+Future.microtask(() => context.go('/home'));
+}
+},
+orElse: () {},
+);
 return Scaffold(
 body: Center(
 child: auth.when(
@@ -42,22 +50,8 @@ TextButton(onPressed: () => context.go('/register'), child: const Text('Create a
 ),
 );
 }
-// TODO: Replace with /home after Stage 2
-return Padding(
-padding: const EdgeInsets.all(24.0),
-child: Column(
-mainAxisAlignment: MainAxisAlignment.center,
-children: [
-const AppLogo(),
-const SizedBox(height: 16),
-Text('Welcome, ${user.name ?? user.email}!', style: Theme.of(context).textTheme.titleLarge),
-const SizedBox(height: 24),
-Text('You\'re logged in. Home screen arrives in Stage 2.'),
-const SizedBox(height: 16),
-OutlinedButton(onPressed: () => ref.read(authStateProvider.notifier).logout(), child: const Text('Log out')),
-],
-),
-);
+// Don't show anything explicitly; redirect happens via maybeWhen above.
+return const SizedBox.shrink();
 },
 ),
 ),
