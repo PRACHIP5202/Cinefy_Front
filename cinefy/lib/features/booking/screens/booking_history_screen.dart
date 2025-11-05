@@ -17,10 +17,12 @@ class BookingHistoryScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) {
           final unauthorized = e is DioException && e.response?.statusCode == 401;
-          if (unauthorized) {
+          final loginRequired = e.toString().contains('Please login');
+          
+          if (unauthorized || loginRequired) {
             return _AuthRequired(onLogin: () => context.push('/login'));
           }
-          return Center(child: Text('Failed to load bookings\n$e'));
+          return Center(child: Text('Failed to load bookings\n${e.toString().replaceFirst('Exception: ', '')}'));
         },
         data: (items) {
           if (items.isEmpty) {
@@ -39,7 +41,8 @@ class BookingHistoryScreen extends ConsumerWidget {
                 seatCount: b.seatIds.length,
                 amount: b.totalPrice,
                 status: b.paymentStatus,
-                onTap: () => Navigator.of(ctx).pushNamed('/ticket/${b.id}'),
+                createdAt: b.createdAt,
+                onTap: () => context.push('/booking-detail/${b.id}'),
               );
             },
           );
@@ -56,6 +59,7 @@ class _BookingTile extends StatelessWidget {
   final int seatCount;
   final double amount;
   final String status;
+  final DateTime createdAt;
   final VoidCallback? onTap;
   const _BookingTile({
     required this.title,
@@ -64,6 +68,7 @@ class _BookingTile extends StatelessWidget {
     required this.seatCount,
     required this.amount,
     required this.status,
+    required this.createdAt,
     this.onTap,
   });
 
@@ -82,6 +87,8 @@ class _BookingTile extends StatelessWidget {
           Text(subtitle),
           const SizedBox(height: 2),
           Text('${_fmt(showTime)} • $seatCount seats'),
+          const SizedBox(height: 2),
+          Text('Booked: ${_fmtDate(createdAt)}', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
         ],
       ),
       trailing: Column(
@@ -107,6 +114,11 @@ class _BookingTile extends StatelessWidget {
     final d = '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
     final t = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     return '$d $t';
+  }
+
+  String _fmtDate(DateTime dt) {
+    final d = '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
+    return d;
   }
 }
 

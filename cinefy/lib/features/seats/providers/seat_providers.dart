@@ -1,11 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/seat_model.dart';
 import '../services/seat_service.dart';
-import '../../booking/services/booking_service.dart';
 
 
 final seatServiceProvider = Provider<SeatService>((_) => SeatService());
-final bookingServiceProvider = Provider<BookingService>((_) => BookingService());
 
 
 final seatsProvider = FutureProvider.family<List<SeatModel>, int>((ref, showId) async {

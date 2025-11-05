@@ -26,7 +26,11 @@ options.headers['Authorization'] = 'Bearer $token';
 return handler.next(options);
 },
 onError: (e, handler) {
-// optional: unify errors here
+// Handle 401 errors by clearing invalid tokens
+if (e.response?.statusCode == 401) {
+// Clear potentially invalid token
+Prefs.clear();
+}
 return handler.next(e);
 },
 ));

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/seat_providers.dart';
+import '../../booking/providers/booking_providers.dart' as booking_providers;
 // Import SeatTile AND the SeatVisual enum from the same file
 import '../widgets/seat_tile.dart' show SeatTile, SeatVisual;
 
@@ -160,29 +161,64 @@ class _BottomBar extends ConsumerWidget {
           FilledButton.icon(
             onPressed: canBook
                 ? () async {
-                    // Revalidate selected seats by refetching before booking
-                    final seats = await ref.read(seatsProvider(showId).future);
-                    final booked = seats.where((s) => s.isBooked).map((s) => s.id).toSet();
-                    final conflict = selection.selected.any(booked.contains);
-                    if (conflict) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Some seats were just booked. Please pick again.')),
-                        );
-                      }
-                      return;
-                    }
+                    // Show loading indicator
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (ctx) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+
                     try {
-                      final bookingId = await ref.read(bookingServiceProvider).book(
+                      // Revalidate selected seats by refetching before booking
+                      final seats = await ref.read(seatsProvider(showId).future);
+                      final booked = seats.where((s) => s.isBooked).map((s) => s.id).toSet();
+                      final conflict = selection.selected.any(booked.contains);
+                      
+                      if (conflict) {
+                        if (context.mounted) {
+                          Navigator.of(context).pop(); // Close loading dialog
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Some seats were just booked. Please pick again.')),
+                          );
+                        }
+                        return;
+                      }
+
+                      final bookingId = await ref.read(booking_providers.bookingServiceProvider).book(
                             showId: showId,
                             seatIds: selection.selected.toList(),
                           );
+                      
                       ref.read(selectionProvider.notifier).clear();
-                      if (context.mounted) context.push('/payment/$bookingId');
+                      
+                      if (context.mounted) {
+                        Navigator.of(context).pop(); // Close loading dialog
+                        context.push('/payment/$bookingId');
+                      }
                     } catch (e) {
                       if (context.mounted) {
+                        Navigator.of(context).pop(); // Close loading dialog
+                        
+                        // Handle specific error cases
+                        String errorMessage = 'Booking failed';
+                        if (e.toString().contains('login')) {
+                          errorMessage = 'Please login to book tickets';
+                          // Optionally navigate to login
+                          context.push('/login');
+                        } else if (e.toString().contains('Session expired')) {
+                          errorMessage = 'Session expired. Please login again';
+                          context.push('/login');
+                        } else {
+                          errorMessage = e.toString().replaceFirst('Exception: ', '');
+                        }
+                        
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Booking failed: $e')),
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Theme.of(context).colorScheme.error,
+                          ),
                         );
                       }
                     }

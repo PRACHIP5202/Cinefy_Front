@@ -10,6 +10,7 @@ import '../features/theatres/screens/theatre_list_screen.dart';
 import '../features/seats/screens/seat_selection_screen.dart';
 import '../features/payment/screens/payment_screen.dart';
 import '../features/booking/screens/booking_history_screen.dart';
+import '../features/booking/screens/booking_detail_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
 
 
@@ -40,6 +41,10 @@ builder: (ctx, s) => PaymentScreen(bookingId: int.parse(s.pathParameters['bookin
       GoRoute(
         path: '/bookings',
         builder: (ctx, s) => const BookingHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/booking-detail/:id',
+        builder: (ctx, s) => BookingDetailScreen(bookingId: int.parse(s.pathParameters['id']!)),
       ),
 ],
 );

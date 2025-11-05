@@ -20,15 +20,14 @@ final theatresAsync = ref.watch(theatresProvider);
 final cities = ref.watch(theatreCitiesProvider);
 final selectedCity = ref.watch(selectedCityProvider);
 
-
-theatresAsync.whenOrNull(data: (_) {
-final citiesNow = ref.read(theatreCitiesProvider);
-final current = ref.read(selectedCityProvider);
-if ((current == null || current.isEmpty) && citiesNow.isNotEmpty) {
-ref.read(selectedCityProvider.notifier).state = citiesNow.first;
-}
+// Initialize selected city if needed, but do it after build completes
+WidgetsBinding.instance.addPostFrameCallback((_) {
+  final citiesNow = ref.read(theatreCitiesProvider);
+  final current = ref.read(selectedCityProvider);
+  if ((current == null || current.isEmpty) && citiesNow.isNotEmpty) {
+    ref.read(selectedCityProvider.notifier).state = citiesNow.first;
+  }
 });
-
 
 final filtered = ref.watch(filteredTheatresProvider(movieId));
 
