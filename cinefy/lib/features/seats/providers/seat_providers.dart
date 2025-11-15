@@ -18,7 +18,7 @@ final int pricePerSeat; // fixed ₹
 final int maxSeats;
 
 
-const SelectionState({this.selected = const {}, this.pricePerSeat = 250, this.maxSeats = 50});
+const SelectionState({this.selected = const {}, this.pricePerSeat = 200, this.maxSeats = 50});
 
 
 int get total => selected.length * pricePerSeat;

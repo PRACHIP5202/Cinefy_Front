@@ -5,7 +5,7 @@ import '../storage/prefs.dart';
 class DioClient {
 static final Dio _dio = Dio(
 BaseOptions(
-baseUrl: 'https://54fvlk9z-4000.inc1.devtunnels.ms/api', // provided
+baseUrl: 'https://cinefy-back.onrender.com/api', // provided
 connectTimeout: const Duration(seconds: 10),
 receiveTimeout: const Duration(seconds: 20),
 headers: {'Content-Type': 'application/json'},

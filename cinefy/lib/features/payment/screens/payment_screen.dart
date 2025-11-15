@@ -35,17 +35,6 @@ totalAmount: result.amount,
 const SizedBox(height: 16),
 _QrTicketPreview(qrUrl: result.ticket.qrUrl, code: result.ticket.code),
 const SizedBox(height: 16),
-Padding(
-padding: const EdgeInsets.symmetric(horizontal: 16),
-child: SizedBox(
-width: double.infinity,
-child: FilledButton.icon(
-icon: const Icon(Icons.airplane_ticket_rounded),
-label: const Text('View Full Ticket'),
-onPressed: () => context.push('/ticket/$bookingId'), // Stage 6
-),
-),
-),
 ],
 ),
 );
