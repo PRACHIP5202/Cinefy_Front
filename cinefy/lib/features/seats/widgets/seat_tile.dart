@@ -23,19 +23,27 @@ class SeatTile extends StatelessWidget {
 
     Color bg;
     Color fg;
+    Color borderColor;
+    double borderOpacity;
     switch (visual) {
       case SeatVisual.booked:
-        bg = Colors.red.withOpacity(.18);
-        fg = Colors.red.shade700;
+        bg = const Color(0xFFE57373); // Light red background - very visible
+        fg = const Color(0xFFB71C1C); // Dark red text
+        borderColor = const Color(0xFFD32F2F); // Red border
+        borderOpacity = 1.0;
         break;
       case SeatVisual.selected:
         bg = cs.primary.withOpacity(.18);
         fg = cs.primary;
+        borderColor = fg;
+        borderOpacity = .6;
         break;
       case SeatVisual.available:
       default:
         bg = cs.surfaceContainerHighest.withOpacity(.7);
         fg = cs.onSurface;
+        borderColor = fg;
+        borderOpacity = .6;
         break;
     }
 
@@ -48,7 +56,7 @@ class SeatTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: fg.withOpacity(.6), width: 1),
+          border: Border.all(color: borderColor.withOpacity(borderOpacity), width: 1),
         ),
         child: Center(
           child: Text(
