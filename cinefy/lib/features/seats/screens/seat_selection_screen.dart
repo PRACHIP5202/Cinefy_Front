@@ -32,38 +32,126 @@ class SeatSelectionScreen extends ConsumerWidget {
               const _ScreenBanner(),
               const SizedBox(height: 8),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 10, // 10 per row
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      childAspectRatio: 42 / 38,
-                    ),
-                    itemCount: allNumbers.length,
-                    itemBuilder: (ctx, i) {
-                      final number = allNumbers[i];
-                      final seat = byNumber[number.toString()];
-                      final realSeatId = seat?.id; // actual backend seat id
-                      final isBooked = seat?.isBooked == true;
-                      final isSelected = realSeatId != null && selection.selected.contains(realSeatId);
-                      final visual = isBooked
-                          ? SeatVisual.booked
-                          : isSelected
-                              ? SeatVisual.selected
-                              : SeatVisual.available;
-                      return SeatTile(
-                        id: realSeatId ?? number,
-                        label: number.toString(),
-                        visual: visual,
-                        onTap: () {
-                          if (realSeatId == null) return; // seat not provisioned yet
-                          ref.read(selectionProvider.notifier).toggle(realSeatId);
-                        },
-                      );
-                    },
-                  ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableWidth = constraints.maxWidth - 24; // padding
+                    final seatSize = ((availableWidth - 48 - 70) / 10).clamp(28.0, 42.0); // responsive size
+                    final seatSpacing = seatSize * 0.15;
+                    final aisleWidth = seatSize * 0.6;
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: 10, // 10 rows
+                      itemBuilder: (ctx, rowIndex) {
+                        // Add extra spacing after row 7 (8-2 configuration)
+                        final isBackRow = rowIndex >= 8;
+                        final bottomPadding = rowIndex == 7 ? 20.0 : 8.0;
+
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: bottomPadding),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Left section: 2 seats
+                              ...List.generate(2, (colIndex) {
+                                final seatIndex = rowIndex * 10 + colIndex;
+                                final number = allNumbers[seatIndex];
+                                final seat = byNumber[number.toString()];
+                                final realSeatId = seat?.id;
+                                final isBooked = seat?.isBooked == true;
+                                final isSelected = realSeatId != null && selection.selected.contains(realSeatId);
+                                final visual = isBooked
+                                    ? SeatVisual.booked
+                                    : isSelected
+                                        ? SeatVisual.selected
+                                        : SeatVisual.available;
+                                return Padding(
+                                  padding: EdgeInsets.only(right: seatSpacing),
+                                  child: SizedBox(
+                                    width: seatSize,
+                                    height: seatSize * 0.9,
+                                    child: SeatTile(
+                                      id: realSeatId ?? number,
+                                      label: number.toString(),
+                                      visual: visual,
+                                      onTap: () {
+                                        if (realSeatId == null) return;
+                                        ref.read(selectionProvider.notifier).toggle(realSeatId);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }),
+                              // Left aisle
+                              SizedBox(width: aisleWidth),
+                              // Center section: 6 seats
+                              ...List.generate(6, (colIndex) {
+                                final seatIndex = rowIndex * 10 + colIndex + 2;
+                                final number = allNumbers[seatIndex];
+                                final seat = byNumber[number.toString()];
+                                final realSeatId = seat?.id;
+                                final isBooked = seat?.isBooked == true;
+                                final isSelected = realSeatId != null && selection.selected.contains(realSeatId);
+                                final visual = isBooked
+                                    ? SeatVisual.booked
+                                    : isSelected
+                                        ? SeatVisual.selected
+                                        : SeatVisual.available;
+                                return Padding(
+                                  padding: EdgeInsets.only(right: seatSpacing),
+                                  child: SizedBox(
+                                    width: seatSize,
+                                    height: seatSize * 0.9,
+                                    child: SeatTile(
+                                      id: realSeatId ?? number,
+                                      label: number.toString(),
+                                      visual: visual,
+                                      onTap: () {
+                                        if (realSeatId == null) return;
+                                        ref.read(selectionProvider.notifier).toggle(realSeatId);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }),
+                              // Right aisle
+                              SizedBox(width: aisleWidth),
+                              // Right section: 2 seats
+                              ...List.generate(2, (colIndex) {
+                                final seatIndex = rowIndex * 10 + colIndex + 8;
+                                final number = allNumbers[seatIndex];
+                                final seat = byNumber[number.toString()];
+                                final realSeatId = seat?.id;
+                                final isBooked = seat?.isBooked == true;
+                                final isSelected = realSeatId != null && selection.selected.contains(realSeatId);
+                                final visual = isBooked
+                                    ? SeatVisual.booked
+                                    : isSelected
+                                        ? SeatVisual.selected
+                                        : SeatVisual.available;
+                                return Padding(
+                                  padding: EdgeInsets.only(right: colIndex == 0 ? seatSpacing : 0),
+                                  child: SizedBox(
+                                    width: seatSize,
+                                    height: seatSize * 0.9,
+                                    child: SeatTile(
+                                      id: realSeatId ?? number,
+                                      label: number.toString(),
+                                      visual: visual,
+                                      onTap: () {
+                                        if (realSeatId == null) return;
+                                        ref.read(selectionProvider.notifier).toggle(realSeatId);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 4),
