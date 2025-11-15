@@ -48,39 +48,37 @@ class MovieCard extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(spacing),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 🎬 Movie Poster with rating overlay
-              AspectRatio(
-                aspectRatio: 2 / 3,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: MoviePoster(url: posterUrl, borderRadius: borderRadius),
-                    ),
-                    Positioned(
-                      left: 10,
-                      top: 10,
-                      child: RatingChip(rating: rating),
-                    )
-                  ],
+              Flexible(
+                child: AspectRatio(
+                  aspectRatio: 2 / 3,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: MoviePoster(url: posterUrl, borderRadius: borderRadius),
+                      ),
+                      Positioned(
+                        left: 10,
+                        top: 10,
+                        child: RatingChip(rating: rating),
+                      )
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: spacing),
               // 🧾 Movie Title (responsive text)
-              Expanded(
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: cs.onSurface,
-                      fontSize: titleFontSize,
-                      height: 1.22,
-                    ),
-                  ),
+              Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: cs.onSurface,
+                  fontSize: titleFontSize,
+                  height: 1.22,
                 ),
               ),
             ],
